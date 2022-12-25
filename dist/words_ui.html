@@ -30,6 +30,8 @@
         font-family: monospace;
         margin-bottom: 0.5em;
         width: max-content;
+        color: black;
+        text-decoration: none;
       }
       #grid .word.max.locked::after {
         content: '🔒';
@@ -53,12 +55,12 @@
       #grid #nextlevel {
         position: absolute;
         top: 0.5em;
-        right: -0.5em;
+        right: 0.25em;
         height: 1.5em;
         width: 1em;
         border: solid 1px darkred;
         border-radius: 0.1em;
-        transform: translateX(100%);
+        /* transform: translateX(100%); */
       }
       #grid #nextlevel::after {
         content: '🔒';
@@ -214,6 +216,11 @@
         margin-right: 1em;
         display: inline-block;
       }
+      #hiscore::before {
+        content: "High Score:";
+        margin-right: 1em;
+        display: inline-block;
+      }
       #score::before {
         content: "Score:";
         margin-right: 1em;
@@ -273,6 +280,7 @@
 
       <div id='stats'>
         <div id='level'></div>
+        <div id='hiscore'>0</div>
         <div id='score'>0</div>
         <div id='timer'></div>
       </div>
@@ -304,6 +312,8 @@
         }
 
         let points = 0;
+        let hiscore = localStorage.getItem("hiscore") || 0;
+        document.querySelector("#hiscore").innerText = hiscore;
 
         const startGame = level => {
           if (level==1) points = 0;
@@ -388,6 +398,11 @@
             if (isNaN(n)) return;
             points += n;
             document.querySelector("#score").innerText = points;
+            if (points > hiscore) {
+              hiscore = points;
+              localStorage.setItem("hiscore", hiscore);
+              document.querySelector("#hiscore").innerText = hiscore;
+            }
           }
 
           const messageDOM = document.querySelector("#message");
@@ -451,7 +466,7 @@
 
           const words = new Map();
           pi.sort((x,y)=>x.length==y.length?x>y:x.length>y.length).forEach(w=>{
-            const word = document.createElement("div");
+            const word = document.createElement("a");
             word.classList.add("word");
             w.split("").forEach(l=>{
               const letter = document.createElement("span");
@@ -473,6 +488,8 @@
                 letter.innerText = l;
                 word.append(letter);
               });
+              word.setAttribute("href", "https://en.wiktionary.org/wiki/"+w.toLowerCase()+"#English");
+              word.setAttribute("target", "_blank");
               if (gameOver)
                 word.classList.add("notfound");
               else {
