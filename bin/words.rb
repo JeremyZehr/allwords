@@ -4,31 +4,41 @@ require 'json'
 require 'fileutils'
 
 # refs = {}
-# words = File.read('./Collins Scrabble Words (2019).txt').split("\r\n")
+# # words = File.read('./Collins Scrabble Words (2019).txt').split("\r\n")
+# words = File.read('./list2p2gfreq.txt').split("\r\n")
+# puts "Number of lines: #{words.length}; head: #{words[0..9]}"
+# words = words.uniq
+# puts "Number of unique words: #{words.length}; head: #{words[0..9]}"
+# words = words.reject{|w|w.length<2}
+# puts "Number of unique words of 2+ letters: #{words.length}; head: #{words[0..9]}"
 
 # words.each{|w| 
 #   refs[w.length] = {} if refs[w.length].nil?
-#   sorted = w.split('').sort().join('')
+#   sorted = w.split('').sort().join('').upcase
 #   refs[w.length][sorted] = [] if refs[w.length][sorted].nil?
-#   refs[w.length][sorted].push(w)
+#   refs[w.length][sorted].push(w.upcase)
 # }
-# File.write("scrabble_refs.json", refs.to_json)
-# puts words.length
-refs = JSON.parse(File.read("./scrabble_refs.json"))
+# puts refs.map{|k,v| "#{k}: #{v.length}; head #{v.keys[0..2]} > #{v.values[0..2]}"}
+# # File.write("scrabble_refs.json", refs.to_json)
+# File.write("gfreq_refs.json", refs.to_json)
+# return
+
+# If already parsed
+# refs = JSON.parse(File.read("./scrabble_refs.json"))
+refs = JSON.parse(File.read("./gfreq_refs.json"))
 dic = {}
 
-# ns_to_load = (2..6).to_a
-ns_to_load = (2..6).to_a
+# ns_to_load = []
+ns_to_load = (2..4).to_a
 ns_to_load.each{|n|
-  fn = "scrabble_dic_#{n}.json"
+  # fn = "scrabble_dic_#{n}.json"
+  fn = "gfreq_dic_#{n}.json"
   dic[n] = JSON.parse(File.read(fn)) if File.exists?(fn)
   puts "loaded #{fn}"
 }
 
-# ns_to_parse = (2..4).to_a
-ns_to_parse = [7]
+ns_to_parse = (5..7).to_a
 ns_to_parse.each{|n_main|
-# refs.each{|k,v|
   k = n_main
   v = refs[k.to_s]
   puts "#{k}: #{v.length}"
@@ -64,6 +74,7 @@ ns_to_parse.each{|n_main|
       }
     }
   }
-  File.write("scrabble_dic_#{k}.json", dic[k].to_json)
+  # File.write("scrabble_dic_#{k}.json", dic[k].to_json)
+  File.write("gfreq_dic_#{k}.json", dic[k].to_json)
   puts "Finished parsing #{k}"
 }
